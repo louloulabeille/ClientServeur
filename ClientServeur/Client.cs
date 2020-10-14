@@ -27,7 +27,7 @@ namespace ClientServeur
             {
                 //while (this._threadClient.IsAlive) {
                 IPAddress localHost = Dns.GetHostEntry(Dns.GetHostName()).AddressList[0];
-                IPEndPoint iPeP = new IPEndPoint(localHost, 8580);
+                IPEndPoint iPeP = new IPEndPoint(localHost, 0);
                 this._tcpClient = new TcpClient(iPeP);
                 Byte[] readBuffer = new Byte[1024];
                 int nbOctet;
