@@ -8,17 +8,65 @@ using System.Threading;
 
 namespace ClientServeur
 {
-    public class Client
+    /// <summary>
+    /// classe serveur
+    /// </summary>
+    public class Client : IOGame
     {
         private TcpClient _tcpClient;
         private Thread _threadClient;
+        private IPAddress _adresseIP;       // adresse ip du serveur
 
-        public Client()
+        #region constructeur
+        /// <summary>
+        /// intialisation du serveur et lancement
+        /// </summary>
+        public Client(IPAddress adresseIP, int port)
+            : base(port)
         {
+            AdresseIP = adresseIP;
+            this._threadClient = new Thread(new ThreadStart(Connexion));
+            this._threadClient.Start();
+        }
 
-            //this._threadClient = new Thread(new ThreadStart(ThreadClientLoop));
-            //this._threadClient.Start();
-            ThreadClientLoop();
+        #region assesseur
+        public IPAddress AdresseIP { get => _adresseIP; set => _adresseIP = value; }
+        #endregion
+
+        #endregion
+        private void Connexion()
+        {
+            //this._tcpClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            this._tcpClient = new TcpClient(AddressFamily.InterNetwork);
+            this._tcpClient.Connect(AdresseIP, Port);
+            if ( this._tcpClient.Connected )
+            {
+                if (!Initclient()) throw (new ApplicationException("La connexion vers le serveur est impossible./nDéclaration de la connexion en lecture seule."));
+            }
+            else
+            {
+                throw ( new SocketException());
+            }
+        }
+
+        /// <summary>
+        /// initialisation pour savoir si la connexion est ok
+        /// le client envoie iCopy
+        /// </summary>
+        /// <returns></returns>
+        private bool Initclient()
+        {
+            NetworkStream nS = this._tcpClient.GetStream();
+            byte[] buffer = System.Text.Encoding.UTF8.GetBytes(MessageReseau.iCopy.ToString());
+            if ( nS.CanWrite )
+            {
+                nS.Write(buffer);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         private void ThreadClientLoop ()
@@ -26,25 +74,22 @@ namespace ClientServeur
             try
             {
                 //while (this._threadClient.IsAlive) {
-                IPAddress localHost = Dns.GetHostEntry(Dns.GetHostName()).AddressList[0];
+                /*IPAddress localHost = Dns.GetHostEntry(Dns.GetHostName()).AddressList[0];
                 IPEndPoint iPeP = new IPEndPoint(localHost, 0);
-                this._tcpClient = new TcpClient(iPeP);
-                Byte[] readBuffer = new Byte[1024];
+                this._tcpClient = new TcpClient(iPeP);*/
+
+                byte[] readBuffer = new byte[1024];
                 int nbOctet;
                 StringBuilder sB = new StringBuilder();
 
-                IPAddress localHost = Dns.GetHostEntry(Dns.GetHostName()).AddressList[0];
-                Socket sok = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                IPAddress ip = new IPAddress(new byte[] { 127, 0, 0, 1 });
-                sok.Connect(ip, 8580);
-
-                do
+                while ( this._threadClient.IsAlive )
                 {
-                    nbOctet = sok.Receive(readBuffer);
-                    sB.AppendFormat("{0}",Encoding.UTF8.GetString(readBuffer));
+                    //nbOctet = this._tcpClient.Receive(readBuffer);
+                    sB.AppendFormat("{0}", Encoding.UTF8.GetString(readBuffer));
                     Debug.WriteLine(sB.ToString());
-                } while (nbOctet != 0);
+                    
 
+                }
                 Debug.WriteLine(sB.ToString());
 
                 /*

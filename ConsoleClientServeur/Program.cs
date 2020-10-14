@@ -8,7 +8,7 @@ namespace ConsoleClientServeur
         static void Main(string[] args)
         {
             //Serveur s = new Serveur();
-            Client c = new Client();
+            Serveur c = new Serveur(8580);
         }
     }
 }
