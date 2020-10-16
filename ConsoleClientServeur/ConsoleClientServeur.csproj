@@ -6,7 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ClientServeur\ClientServeur.csproj" />
+    <ProjectReference Include="..\..\Sokoban\ClientServeur\ClientsServeur.csproj" />
+    <ProjectReference Include="..\..\Sokoban\Utilitaires\Utilitaires.csproj" />
   </ItemGroup>
 
 </Project>
